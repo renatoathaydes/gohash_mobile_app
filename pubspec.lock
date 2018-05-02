@@ -235,6 +235,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.5.1"
+  path_provider:
+    dependency: "direct main"
+    description:
+      name: path_provider
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.4.0"
   plugin:
     dependency: transitive
     description:
@@ -396,3 +403,4 @@ packages:
     version: "2.1.13"
 sdks:
   dart: ">=2.0.0-edge <=2.0.0-edge.c080951d45e79cd25df98036c4be835b284a269c"
+  flutter: ">=0.1.4 <2.0.0"
