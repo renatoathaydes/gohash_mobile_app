@@ -1,8 +1,6 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:gohash_mobile/gohash_mobile.dart';
+import 'package:gohash_mobile_app/functions.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 const _boldFont = TextStyle(fontWeight: FontWeight.bold);
@@ -37,7 +35,9 @@ class LoginInfoWidget extends StatelessWidget {
                 Text('Username:', style: _boldFont),
                 Text(_loginInfo.username),
                 Text('URL:', style: _boldFont),
-                Hyperlink(_loginInfo.url),
+                Hyperlink(_loginInfo.url)
+                  ..tapCallback = copyToClipboard(_loginInfo.password,
+                      clearAfterTimeout: true),
                 Text('Last changed:', style: _boldFont),
                 Text("${_loginInfo.updatedAt}"),
                 Text('Description:', style: _boldFont),
@@ -64,15 +64,7 @@ class CopierIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
         onTap: () {
-          Clipboard.setData(ClipboardData(text: value));
-          if (clearAfterTimeout) {
-            Future.delayed(const Duration(seconds: 10), () async {
-              final data = await Clipboard.getData('text/plain');
-              if (data?.text == value) {
-                Clipboard.setData(ClipboardData(text: ''));
-              }
-            });
-          }
+          copyToClipboard(value, clearAfterTimeout: clearAfterTimeout);
           Scaffold
               .of(context)
               .showSnackBar(SnackBar(content: Text(onCopiedMessage)));
@@ -87,6 +79,7 @@ const hyperlinkStyle =
 
 class Hyperlink extends StatelessWidget {
   final String text;
+  GestureTapCallback tapCallback;
 
   Hyperlink(String text) : this.text = _toLink(text);
 
@@ -103,6 +96,13 @@ class Hyperlink extends StatelessWidget {
     return "https://$value";
   }
 
+  _onTap() async {
+    launch(text);
+    if (tapCallback != null) {
+      tapCallback();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (text.isEmpty) {
@@ -111,7 +111,7 @@ class Hyperlink extends StatelessWidget {
 
     return GestureDetector(
       child: Text(text, style: hyperlinkStyle),
-      onTap: () async => await launch(text),
+      onTap: _onTap,
     );
   }
 }
