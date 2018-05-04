@@ -1,0 +1,28 @@
+PODS:
+  - Flutter (1.0.0)
+  - gohash_mobile (0.0.1):
+    - Flutter
+  - path_provider (0.0.1):
+    - Flutter
+
+DEPENDENCIES:
+  - Flutter (from `Pods/.symlinks/flutter/ios`)
+  - gohash_mobile (from `Pods/.symlinks/plugins/gohash_mobile/ios`)
+  - path_provider (from `Pods/.symlinks/plugins/path_provider/ios`)
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Pods/.symlinks/flutter/ios
+  gohash_mobile:
+    :path: Pods/.symlinks/plugins/gohash_mobile/ios
+  path_provider:
+    :path: Pods/.symlinks/plugins/path_provider/ios
+
+SPEC CHECKSUMS:
+  Flutter: 9d0fac939486c9aba2809b7982dfdbb47a7b0296
+  gohash_mobile: d1c6baa9055968f0b5c736863dd5d8b23d0cd585
+  path_provider: 09407919825bfe3c2deae39453b7a5b44f467873
+
+PODFILE CHECKSUM: c381242c93ec11f9605234a854ec09131b76f1a4
+
+COCOAPODS: 1.5.0
