@@ -3,8 +3,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gohash_mobile/gohash_mobile.dart';
+import 'package:gohash_mobile_app/widgets.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
+
+const _biggerFont = TextStyle(fontSize: 18.0);
 
 void main() => runApp(new GoHashApp());
 
@@ -30,9 +33,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<HomePage> {
-  final _biggerFont = const TextStyle(fontSize: 18.0);
-  final _boldFont = const TextStyle(fontWeight: FontWeight.bold);
-  String _errorMessage = 'No errors!';
+  String _errorMessage = '';
   GohashDb _database;
   int _selectedGroupIndex;
 
@@ -54,7 +55,7 @@ class _MyHomePageState extends State<HomePage> {
 
   // Platform messages are asynchronous, so we initialize in an async method.
   initPlatformState() async {
-    GohashDb database;
+    GohashDb database = const GohashDb('', []);
     var errorMessage = '';
     final dbFile = await _loadDbFile();
 
@@ -69,7 +70,7 @@ class _MyHomePageState extends State<HomePage> {
       // method is missing
       errorMessage = 'Internal app error - missing method';
     } on Error catch (e) {
-      errorMessage = 'Catastrophic error: $e';
+      errorMessage = 'Error reading go-hash database: $e';
     }
 
     // If the widget was removed from the tree while the asynchronous platform
@@ -84,44 +85,9 @@ class _MyHomePageState extends State<HomePage> {
     });
   }
 
-  _showEntry(LoginInfo loginInfo) {
-    showDialog(
-        context: context,
-        builder: (ctx) => SimpleDialog(
-              contentPadding: EdgeInsets.all(10.0),
-              children: [
-                Text('Username:', style: _boldFont),
-                Text(loginInfo.username),
-                Text('URL:', style: _boldFont),
-                Text(loginInfo.url),
-                Text('Last changed:', style: _boldFont),
-                Text("${loginInfo.updatedAt}"),
-                Text('Description:', style: _boldFont),
-                Text(loginInfo.description),
-              ],
-            ));
-  }
-
-  Widget _buildCopierIcon(IconData icon, String value) {
-    return GestureDetector(
-        onTap: () => Clipboard.setData(ClipboardData(text: value)),
-        child:
-            Container(padding: EdgeInsets.only(left: 10.0), child: Icon(icon)));
-  }
-
-  Widget buildEntry(LoginInfo loginInfo) {
-    return ListTile(
-        trailing: Icon(Icons.description),
-        title: Row(children: [
-          Text(loginInfo.name),
-          _buildCopierIcon(Icons.person, loginInfo.username),
-          _buildCopierIcon(Icons.vpn_key, loginInfo.password),
-        ]),
-        onTap: () => _showEntry(loginInfo));
-  }
-
   Widget _buildGroupBody(Group group) {
-    return Column(children: group.entries.map(buildEntry).toList());
+    return Column(
+        children: group.entries.map((e) => new LoginInfoWidget(e)).toList());
   }
 
   ExpansionPanel _buildGroup(int index, Group group) {
@@ -136,6 +102,13 @@ class _MyHomePageState extends State<HomePage> {
   }
 
   Widget _buildGroups() {
+    if (_database == null || _database.groups.isEmpty) {
+      return Text(
+        'Empty go-hash database',
+        style: _biggerFont,
+      );
+    }
+
     final panels = _database.groups
         .asMap()
         .map((index, group) => MapEntry(index, _buildGroup(index, group)));
