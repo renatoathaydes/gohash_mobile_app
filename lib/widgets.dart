@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gohash_mobile/gohash_mobile.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 const _boldFont = TextStyle(fontWeight: FontWeight.bold);
 
@@ -36,7 +37,7 @@ class LoginInfoWidget extends StatelessWidget {
                 Text('Username:', style: _boldFont),
                 Text(_loginInfo.username),
                 Text('URL:', style: _boldFont),
-                Text(_loginInfo.url),
+                Hyperlink(_loginInfo.url),
                 Text('Last changed:', style: _boldFont),
                 Text("${_loginInfo.updatedAt}"),
                 Text('Description:', style: _boldFont),
@@ -78,5 +79,39 @@ class CopierIcon extends StatelessWidget {
         },
         child: Container(
             padding: EdgeInsets.only(left: 10.0), child: Icon(iconData)));
+  }
+}
+
+const hyperlinkStyle =
+    TextStyle(color: Colors.blue, decoration: TextDecoration.underline);
+
+class Hyperlink extends StatelessWidget {
+  final String text;
+
+  Hyperlink(String text) : this.text = _toLink(text);
+
+  static String _toLink(String value) {
+    if (value.isEmpty) {
+      // no value, can't make up any links
+      return '';
+    }
+    if (value.startsWith(RegExp('http:|https:|tel:|sms:|mailto:'))) {
+      // this is most likely a link already
+      return value;
+    }
+    // make it a link
+    return "https://$value";
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (text.isEmpty) {
+      return const Text('');
+    }
+
+    return GestureDetector(
+      child: Text(text, style: hyperlinkStyle),
+      onTap: () async => await launch(text),
+    );
   }
 }
